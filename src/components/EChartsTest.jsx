@@ -5,6 +5,7 @@ import ReactECharts from "echarts-for-react";
 const EChartsTest = () => {
   const [dados, setDados] = useState([]);
   const [countByStatus, setCountByStatus] = useState({});
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     fetch("/files/data.csv")
@@ -20,6 +21,9 @@ const EChartsTest = () => {
         }, {});
 
         setCountByStatus(countStatus);
+        setTotal(
+          Object.values(countStatus).reduce((sum, value) => sum + value, 0)
+        );
         console.log(`countStatus: ${JSON.stringify(countStatus)}`);
       });
   }, []);
@@ -30,7 +34,7 @@ const EChartsTest = () => {
     E: "#4CAF50", // Verde
   };
 
-  const option = {
+  const barOption = {
     title: {
       text: "Análise de Expiração",
       left: "center",
@@ -58,10 +62,36 @@ const EChartsTest = () => {
     ],
   };
 
+  const pieOption = {
+    title: {
+      text: "Percentual de Expiração",
+      left: "center",
+    },
+    tooltip: {
+      trigger: "item",
+      formatter: "{b}: {c} ({d}%)",
+    },
+    series: [
+      {
+        name: "Percentual",
+        type: "pie",
+        radius: "50%",
+        data: Object.keys(countByStatus).map((key) => ({
+          name: key,
+          value: ((countByStatus[key] / total) * 100).toFixed(2),
+          itemStyle: {
+            color: colors[key] || "#000000",
+          },
+        })),
+      },
+    ],
+  };
+
   return (
     <div>
       <h1>My ECharts Test</h1>
-      <ReactECharts option={option} style={{ height: 400 }} />
+      <ReactECharts option={barOption} style={{ height: 400 }} />
+      <ReactECharts option={pieOption} style={{ height: 400 }} />
       <table className="table table-striped table-bordered">
         <caption>Lista de Dados</caption>
         <colgroup>

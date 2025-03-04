@@ -58,6 +58,8 @@ const EChartsTest = () => {
             color: colors[key] || "#000000",
           },
         })),
+        animationDuration: 1000,
+        animationEasing: "cubicInOut",
       },
     ],
   };
